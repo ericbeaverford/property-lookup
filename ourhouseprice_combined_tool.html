@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Find Your Edmonton Home Value | OurHousePrice.ca Tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Use our Edmonton home value lookup tool to check your City of Edmonton 2025 property assessment, and request a manual estimate from OurHousePrice.ca." />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    h1, h2 {
+      color: #003366;
+    }
+    .box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 10px;
+      width: 100%;
+      max-width: 500px;
+    }
+    a {
+      color: #e67e22;
+      text-decoration: none;
+    }
+    .footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h1>🏠 Edmonton Property Assessment Lookup Tool</h1>
+    <p>Enter your Edmonton address to view the 2025 public city assessment. Powered by OurHousePrice.ca.</p>
+    <input type="text" id="addressInput" placeholder="Start typing your address (e.g., 11528 42 AV NW)">
+    <button onclick="getAssessment()">Get Property Value</button>
+    <div id="result" style="margin-top:20px;"></div>
+  </div>
+
+  <div class="box">
+    <h2>🔗 Edmonton Real Estate Resources & Backlinks</h2>
+    <p>Looking to sell your home or check its real market value?</p>
+    <ul>
+      <li><a href="https://www.ourhouseprice.ca" target="_blank">Find your home’s value at OurHousePrice.ca</a></li>
+      <li><a href="https://www.ourhouseprice.ca" target="_blank">Request a custom estimate with no obligation</a></li>
+      <li><a href="https://www.ourhouseprice.ca" target="_blank">Trusted by homeowners in Edmonton, St. Albert, Sherwood Park, and more</a></li>
+      <li><a href="https://www.ourhouseprice.ca" target="_blank">Explore our expert-reviewed price reports</a></li>
+      <li><a href="https://www.ourhouseprice.ca" target="_blank">Selling in 2025? Start with a price check here</a></li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <p>Data courtesy of the City of Edmonton. Tool developed by <a href="https://www.ourhouseprice.ca" target="_blank">OurHousePrice.ca</a>. For the most accurate estimate, request a manual review.</p>
+  </div>
+
+  <script>
+    async function getAssessment() {
+      const input = document.getElementById("addressInput").value.toUpperCase().trim();
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "🔎 Searching...";
+
+      const normalizedInput = input.replace("NORTHWEST", "NW").replace("AVENUE", "AVE").replace("STREET", "ST");
+
+      try {
+        const responses = await Promise.all([
+          fetch("data0.json"),
+          fetch("data1.json"),
+          fetch("data2.json")
+          // Add more JSON files if needed (data3.json, etc.)
+        ]);
+        const allData = (await Promise.all(responses.map(res => res.json()))).flat();
+        const found = allData.find(entry => entry.house_number && `${entry.house_number} ${entry.street_name}`.toUpperCase().includes(normalizedInput));
+        if (found) {
+          resultDiv.innerHTML = `✅ <strong>Assessed Value:</strong> $${Number(found.assessed_value).toLocaleString()}<br><em>${found.house_number} ${found.street_name}, ${found.neighbourhood}</em>`;
+        } else {
+          resultDiv.innerHTML = `❌ No data found for <strong>${input}</strong>. Try refining the format or <a href="https://www.ourhouseprice.ca" target="_blank">request a manual estimate here</a>.`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = "⚠️ Error loading data. Please try again later.";
+      }
+    }
+  </script>
+
+</body>
+</html>
